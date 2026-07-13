@@ -1,4 +1,4 @@
-import { SearchIcon } from '../ui/Icons';
+import { SearchIcon } from '../../../components/ui/Icons';
 
 interface SearchInputProps {
   value: string;

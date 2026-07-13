@@ -1,5 +1,5 @@
-import type { Post } from '../../types';
-import { ShieldSmall, MapPin, Heart, MessageCircle } from '../ui/Icons';
+import type { Post } from '../../../types';
+import { ShieldSmall, MapPin, Heart, MessageCircle } from '../../../components/ui/Icons';
 import DangerBadge from './DangerBadge';
 
 interface PostCardProps {

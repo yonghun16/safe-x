@@ -3,7 +3,7 @@ import type { Post } from '../types';
 import { ChevronRight } from '../components/ui/Icons';
 import AppHeader from '../components/layout/AppHeader';
 import PageContainer from '../components/layout/PageContainer';
-import SearchInput from '../components/common/SearchInput';
+import SearchInput from '../features/search/components/SearchInput';
 
 interface SearchScreenProps {
   posts: Post[];

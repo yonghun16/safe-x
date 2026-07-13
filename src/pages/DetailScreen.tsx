@@ -2,9 +2,9 @@ import React from 'react';
 import type { Post } from '../types';
 import { ChevronLeft, MoreIcon, ShieldSmall, MapPin, Heart, MessageCircle, Share } from '../components/ui/Icons';
 import AppHeader from '../components/layout/AppHeader';
-import DangerBadge from '../components/common/DangerBadge';
-import CommentInput from '../components/common/CommentInput';
-import CommentItem from '../components/common/CommentItem';
+import DangerBadge from '../features/posts/components/DangerBadge';
+import CommentInput from '../features/comments/components/CommentInput';
+import CommentItem from '../features/comments/components/CommentItem';
 
 interface DetailScreenProps {
   post: Post;

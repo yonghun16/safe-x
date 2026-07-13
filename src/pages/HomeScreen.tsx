@@ -3,8 +3,8 @@ import type { Post } from '../types';
 import { ShieldSmall, Bell } from '../components/ui/Icons';
 import AppHeader from '../components/layout/AppHeader';
 import PageContainer from '../components/layout/PageContainer';
-import FeedTabs from '../components/common/FeedTabs';
-import PostCard from '../components/common/PostCard';
+import FeedTabs from '../features/posts/components/FeedTabs';
+import PostCard from '../features/posts/components/PostCard';
 
 interface HomeScreenProps {
   posts: Post[];

@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import type { Post } from '../../types';
+import type { Post } from '../../../types';
 
 interface DangerBadgeProps {
   level: Post['dangerLevel'];
