@@ -1,5 +1,10 @@
 import React, { useState, type FormEvent } from 'react';
-import { Shield, Email, Lock, Eye, EyeOff, Check, AlertCircle } from '../components/ui/Icons';
+import { Shield, Email, Lock, Eye, EyeOff } from '../components/ui/Icons';
+import InputField from '../components/ui/InputField';
+import Button from '../components/ui/Button';
+import Checkbox from '../components/ui/Checkbox';
+import { FormGroup } from '../components/ui/FormError';
+import { validateEmail, validatePassword } from '../utils/validation';
 
 interface LoginScreenProps {
   onLoginSuccess: (email: string) => void;
@@ -25,27 +30,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
   const [isLoginLoading, setIsLoginLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-
-  const validateEmail = (email: string) => {
-    if (!email) {
-      return '이메일을 입력해주세요.';
-    }
-    const re = /\S+@\S+\.\S+/;
-    if (!re.test(email)) {
-      return '올바른 이메일 형식이 아닙니다.';
-    }
-    return '';
-  };
-
-  const validatePassword = (pass: string) => {
-    if (!pass) {
-      return '비밀번호를 입력해주세요.';
-    }
-    if (pass.length < 6) {
-      return '비밀번호는 최소 6자 이상이어야 합니다.';
-    }
-    return '';
-  };
 
   const handleLoginSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -88,64 +72,49 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
       </div>
 
       <form onSubmit={handleLoginSubmit}>
-        {/* Email Input */}
-        <div className="form-group">
-          <div className="input-icon-wrapper">
-            <span className="input-left-icon"><Email /></span>
-            <input
-              type="text"
-              className={`input-field ${emailError ? 'error' : ''}`}
-              placeholder="이메일을 입력하세요"
-              value={loginEmail}
-              onChange={(e) => {
-                setLoginEmail(e.target.value);
-                if (emailError) setEmailError(validateEmail(e.target.value));
-              }}
-              onBlur={() => setEmailError(validateEmail(loginEmail))}
-            />
-          </div>
-          {emailError && <div className="error-message"><AlertCircle /> {emailError}</div>}
-        </div>
+        <FormGroup error={emailError}>
+          <InputField
+            icon={<Email />}
+            type="text"
+            placeholder="이메일을 입력하세요"
+            value={loginEmail}
+            onChange={(e) => {
+              setLoginEmail(e.target.value);
+              if (emailError) setEmailError(validateEmail(e.target.value));
+            }}
+            onBlur={() => setEmailError(validateEmail(loginEmail))}
+          />
+        </FormGroup>
 
-        {/* Password Input */}
-        <div className="form-group">
-          <div className="input-icon-wrapper">
-            <span className="input-left-icon"><Lock /></span>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              className={`input-field ${passwordError ? 'error' : ''}`}
-              placeholder="비밀번호를 입력하세요"
-              value={loginPassword}
-              onChange={(e) => {
-                setLoginPassword(e.target.value);
-                if (passwordError) setPasswordError(validatePassword(e.target.value));
-              }}
-              onBlur={() => setPasswordError(validatePassword(loginPassword))}
-            />
-            <button
-              type="button"
-              className="input-right-btn"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <EyeOff /> : <Eye />}
-            </button>
-          </div>
-          {passwordError && <div className="error-message"><AlertCircle /> {passwordError}</div>}
-        </div>
+        <FormGroup error={passwordError}>
+          <InputField
+            icon={<Lock />}
+            type={showPassword ? 'text' : 'password'}
+            placeholder="비밀번호를 입력하세요"
+            value={loginPassword}
+            onChange={(e) => {
+              setLoginPassword(e.target.value);
+              if (passwordError) setPasswordError(validatePassword(e.target.value));
+            }}
+            onBlur={() => setPasswordError(validatePassword(loginPassword))}
+            rightAction={
+              <button
+                type="button"
+                className="input-right-btn"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff /> : <Eye />}
+              </button>
+            }
+          />
+        </FormGroup>
 
-        {/* Options / Remember Me */}
         <div className="form-options">
-          <label className="remember-me">
-            <input
-              type="checkbox"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-            />
-            <span className="checkbox-custom">
-              <Check />
-            </span>
-            <span>로그인 상태 유지</span>
-          </label>
+          <Checkbox
+            checked={rememberMe}
+            onChange={setRememberMe}
+            label="로그인 상태 유지"
+          />
           <div className="forgot-links">
             <a href="#forgot-pw" onClick={(e) => { e.preventDefault(); showToast('이메일 링크로 비밀번호 재설정을 전송했습니다.'); }}>비밀번호 찾기</a>
             <span>|</span>
@@ -153,31 +122,18 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
           </div>
         </div>
 
-        {/* Login Button */}
-        <button
-          type="submit"
-          className="btn-primary"
-          disabled={isLoginLoading}
-        >
-          {isLoginLoading ? (
-            <>
-              <span className="spinner" />
-              로그인 중...
-            </>
-          ) : (
-            '로그인'
-          )}
-        </button>
+        <Button type="submit" isLoading={isLoginLoading} loadingText="로그인 중...">
+          로그인
+        </Button>
       </form>
 
-      {/* Social Login Divider & Buttons */}
       <div className="social-login-section">
         <div className="divider-container">
           <span className="divider-line" />
           <span className="divider-text">또는 간편 로그인</span>
           <span className="divider-line" />
         </div>
-        
+
         <div className="social-btn-container">
           <button
             onClick={() => handleSocialLogin('Kakao')}

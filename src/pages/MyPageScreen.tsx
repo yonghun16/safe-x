@@ -1,5 +1,7 @@
 import React from 'react';
 import { Bell, User, ChevronRight } from '../components/ui/Icons';
+import AppHeader from '../components/layout/AppHeader';
+import PageContainer from '../components/layout/PageContainer';
 
 interface MyPageScreenProps {
   userName: string;
@@ -20,18 +22,18 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({
   const finalEmail = email || 'hong@email.com';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, paddingBottom: '88px' }}>
-      <div className="app-header">
-        <h3 className="header-title" style={{ paddingLeft: '24px' }}>마이페이지</h3>
-        <div className="header-right">
+    <PageContainer>
+      <AppHeader
+        title="마이페이지"
+        titleStyle={{ paddingLeft: '24px' }}
+        right={
           <button type="button" className="header-btn" onClick={() => showToast('새로운 알림이 없습니다.')}>
             <Bell />
           </button>
-        </div>
-      </div>
+        }
+      />
 
       <div className="profile-container">
-        {/* User avatar and profile card */}
         <div className="profile-card">
           <div className="profile-avatar-large">
             {finalName.substring(0, 1)}
@@ -42,7 +44,6 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({
           </div>
         </div>
 
-        {/* Option list buttons */}
         <div className="profile-menu">
           <button type="button" className="profile-menu-item" onClick={() => onNavigateToSearchWithUser(finalName)}>
             <div className="profile-menu-item-left">
@@ -76,7 +77,6 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({
             <span className="profile-menu-item-right"><ChevronRight /></span>
           </button>
 
-          {/* LOGOUT BUTTON - Return to login screen */}
           <button
             type="button"
             className="profile-menu-item logout"
@@ -91,7 +91,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

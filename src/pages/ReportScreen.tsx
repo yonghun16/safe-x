@@ -1,5 +1,8 @@
 import React, { useState, type FormEvent } from 'react';
 import { Camera, MapPin } from '../components/ui/Icons';
+import Button from '../components/ui/Button';
+import AppHeader from '../components/layout/AppHeader';
+import PageContainer from '../components/layout/PageContainer';
 
 interface ReportScreenProps {
   onAddPost: (post: {
@@ -65,7 +68,6 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ onAddPost, showToast }) => 
       imageColor2: color2
     });
 
-    // Reset Form
     setReportTitle('');
     setReportContent('');
     setReportLocation('');
@@ -74,13 +76,10 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ onAddPost, showToast }) => 
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, paddingBottom: '88px' }}>
-      <div className="app-header">
-        <h3 className="header-title" style={{ paddingLeft: '24px' }}>제보 등록</h3>
-      </div>
-      
+    <PageContainer>
+      <AppHeader title="제보 등록" titleStyle={{ paddingLeft: '24px' }} />
+
       <form onSubmit={handleReportSubmit} className="report-container">
-        {/* Image Upload Box */}
         <div className="report-section">
           <label className="report-label">사진 업로드</label>
           <div className="upload-box" onClick={handlePhotoSelect}>
@@ -98,7 +97,6 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ onAddPost, showToast }) => 
           </div>
         </div>
 
-        {/* Title Input */}
         <div className="report-section">
           <label className="report-label">제목</label>
           <input
@@ -110,7 +108,6 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ onAddPost, showToast }) => 
           />
         </div>
 
-        {/* Content Textarea */}
         <div className="report-section">
           <label className="report-label">내용</label>
           <textarea
@@ -121,7 +118,6 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ onAddPost, showToast }) => 
           />
         </div>
 
-        {/* Location Input */}
         <div className="report-section">
           <label className="report-label">위치</label>
           <div className="report-location-wrapper">
@@ -136,7 +132,6 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ onAddPost, showToast }) => 
           </div>
         </div>
 
-        {/* Hazard level radio selector */}
         <div className="report-section" style={{ marginBottom: '32px' }}>
           <label className="report-label">위험도</label>
           <div className="level-radio-group">
@@ -157,12 +152,9 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ onAddPost, showToast }) => 
           </div>
         </div>
 
-        {/* Submit button */}
-        <button type="submit" className="btn-primary">
-          등록하기
-        </button>
+        <Button type="submit">등록하기</Button>
       </form>
-    </div>
+    </PageContainer>
   );
 };
 

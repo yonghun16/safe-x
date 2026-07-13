@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { Post } from '../types';
 import { ChevronLeft, MoreIcon, ShieldSmall, MapPin, Heart, MessageCircle, Share } from '../components/ui/Icons';
+import AppHeader from '../components/layout/AppHeader';
+import DangerBadge from '../components/common/DangerBadge';
+import CommentInput from '../components/common/CommentInput';
+import CommentItem from '../components/common/CommentItem';
 
 interface DetailScreenProps {
   post: Post;
@@ -17,32 +21,22 @@ const DetailScreen: React.FC<DetailScreenProps> = ({
   onAddComment,
   showToast
 }) => {
-  const [commentText, setCommentText] = useState('');
-
-  const handleSubmitComment = () => {
-    if (!commentText.trim()) return;
-    onAddComment(post.id, commentText);
-    setCommentText('');
-  };
-
   return (
     <div className="detail-container" style={{ paddingBottom: '140px' }}>
-      {/* Sticky app header */}
-      <div className="app-header">
-        <div className="header-left">
+      <AppHeader
+        title="게시글 상세"
+        left={
           <button type="button" className="header-btn" onClick={onBack}>
             <ChevronLeft />
           </button>
-        </div>
-        <h3 className="header-title">게시글 상세</h3>
-        <div className="header-right">
+        }
+        right={
           <button type="button" className="header-btn" onClick={() => showToast('추가 기능 준비 중입니다.')}>
             <MoreIcon />
           </button>
-        </div>
-      </div>
+        }
+      />
 
-      {/* Main Photo Banner */}
       <div
         className="detail-img-banner"
         style={{
@@ -60,15 +54,12 @@ const DetailScreen: React.FC<DetailScreenProps> = ({
         </div>
       </div>
 
-      {/* Post Details Content */}
       <div className="detail-content">
         <div className="detail-badge-row">
-          <span className={`post-badge level-${post.dangerLevel}`} style={{ position: 'relative', top: 0, right: 0 }}>
-            위험도 {post.dangerLevel === 'high' ? '높음' : post.dangerLevel === 'medium' ? '보통' : '낮음'}
-          </span>
+          <DangerBadge level={post.dangerLevel} style={{ position: 'relative', top: 0, right: 0 }} />
         </div>
         <h2 className="detail-title">{post.title}</h2>
-        
+
         <div className="detail-info-row">
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <MapPin />
@@ -105,7 +96,6 @@ const DetailScreen: React.FC<DetailScreenProps> = ({
         </div>
       </div>
 
-      {/* Comments Feed list */}
       <div className="comments-header">
         댓글 {post.commentsCount}
       </div>
@@ -116,43 +106,12 @@ const DetailScreen: React.FC<DetailScreenProps> = ({
           </div>
         ) : (
           post.comments.map((comment) => (
-            <div key={comment.id} className="comment-item">
-              <div className="comment-avatar">
-                {comment.user.substring(0, 1)}
-              </div>
-              <div className="comment-body">
-                <div className="comment-top-row">
-                  <span className="comment-user">{comment.user}</span>
-                  <span className="comment-time">{comment.time}</span>
-                </div>
-                <p className="comment-text">{comment.text}</p>
-              </div>
-            </div>
+            <CommentItem key={comment.id} comment={comment} />
           ))
         )}
       </div>
 
-      {/* Sticky bottom comment input field */}
-      <div className="comment-input-area" style={{ bottom: '24px', left: 0, right: 0, zIndex: 9 }}>
-        <input
-          type="text"
-          className="comment-input"
-          placeholder="댓글을 입력하세요..."
-          value={commentText}
-          onChange={(e) => setCommentText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleSubmitComment();
-          }}
-        />
-        <button
-          type="button"
-          onClick={handleSubmitComment}
-          className="comment-submit-btn"
-          disabled={!commentText.trim()}
-        >
-          등록
-        </button>
-      </div>
+      <CommentInput onSubmit={(text) => onAddComment(post.id, text)} />
     </div>
   );
 };

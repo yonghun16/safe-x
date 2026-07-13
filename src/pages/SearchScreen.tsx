@@ -1,6 +1,9 @@
 import React from 'react';
 import type { Post } from '../types';
-import { SearchIcon, ChevronRight } from '../components/ui/Icons';
+import { ChevronRight } from '../components/ui/Icons';
+import AppHeader from '../components/layout/AppHeader';
+import PageContainer from '../components/layout/PageContainer';
+import SearchInput from '../components/common/SearchInput';
 
 interface SearchScreenProps {
   posts: Post[];
@@ -17,32 +20,19 @@ const SearchScreen: React.FC<SearchScreenProps> = ({
   onSelectPost,
   showToast
 }) => {
-  const filteredPosts = posts.filter(post => 
-    post.title.includes(searchQuery) || 
+  const filteredPosts = posts.filter(post =>
+    post.title.includes(searchQuery) ||
     post.location.includes(searchQuery) ||
     post.description.includes(searchQuery)
   );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, paddingBottom: '88px' }}>
-      <div className="app-header">
-        <h3 className="header-title" style={{ paddingLeft: '24px' }}>검색</h3>
-      </div>
+    <PageContainer>
+      <AppHeader title="검색" titleStyle={{ paddingLeft: '24px' }} />
 
       <div className="search-container">
-        {/* Search query input box */}
-        <div className="search-input-wrapper">
-          <span className="search-input-icon"><SearchIcon /></span>
-          <input
-            type="text"
-            className="search-input"
-            placeholder="검색어를 입력하세요"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+        <SearchInput value={searchQuery} onChange={setSearchQuery} />
 
-        {/* Recent search section */}
         <div className="search-section">
           <h4 className="search-section-title">최근 검색</h4>
           <div className="search-pills">
@@ -72,7 +62,6 @@ const SearchScreen: React.FC<SearchScreenProps> = ({
           </div>
         </div>
 
-        {/* Recommended areas section */}
         <div className="search-section">
           <h4 className="search-section-title">추천 지역</h4>
           <div className="grid-areas">
@@ -98,7 +87,6 @@ const SearchScreen: React.FC<SearchScreenProps> = ({
           </div>
         </div>
 
-        {/* Real-time search result indicator */}
         {searchQuery && (
           <div style={{ marginTop: '16px', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
             <h4 className="search-section-title">검색된 제보 ({filteredPosts.length}건)</h4>
@@ -133,7 +121,7 @@ const SearchScreen: React.FC<SearchScreenProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

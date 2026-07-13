@@ -1,5 +1,10 @@
 import React, { useState, type FormEvent } from 'react';
-import { ChevronLeft, User, Email, Lock, Check, AlertCircle } from '../components/ui/Icons';
+import { ChevronLeft, User, Email, Lock } from '../components/ui/Icons';
+import InputField from '../components/ui/InputField';
+import Button from '../components/ui/Button';
+import Checkbox from '../components/ui/Checkbox';
+import { FormGroup } from '../components/ui/FormError';
+import { validateEmail, validatePassword } from '../utils/validation';
 
 interface SignupScreenProps {
   onSignupSuccess: (email: string, name: string) => void;
@@ -24,39 +29,18 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
   const [signupPasswordError, setSignupPasswordError] = useState('');
   const [signupPasswordConfirmError, setSignupPasswordConfirmError] = useState('');
 
-  const validateEmail = (email: string) => {
-    if (!email) {
-      return '이메일을 입력해주세요.';
-    }
-    const re = /\S+@\S+\.\S+/;
-    if (!re.test(email)) {
-      return '올바른 이메일 형식이 아닙니다.';
-    }
-    return '';
-  };
-
-  const validatePassword = (pass: string) => {
-    if (!pass) {
-      return '비밀번호를 입력해주세요.';
-    }
-    if (pass.length < 6) {
-      return '비밀번호는 최소 6자 이상이어야 합니다.';
-    }
-    return '';
-  };
-
   const handleSignupSubmit = (e: FormEvent) => {
     e.preventDefault();
-    
+
     let isValid = true;
-    
+
     if (!signupName.trim()) {
       setSignupNameError('이름을 입력해주세요.');
       isValid = false;
     } else {
       setSignupNameError('');
     }
-    
+
     const emailErr = validateEmail(signupEmail);
     if (emailErr) {
       setSignupEmailError(emailErr);
@@ -64,7 +48,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
     } else {
       setSignupEmailError('');
     }
-    
+
     const passErr = validatePassword(signupPassword);
     if (passErr) {
       setSignupPasswordError(passErr);
@@ -72,7 +56,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
     } else {
       setSignupPasswordError('');
     }
-    
+
     if (signupPassword !== signupPasswordConfirm) {
       setSignupPasswordConfirmError('비밀번호가 일치하지 않습니다.');
       isValid = false;
@@ -109,115 +93,75 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
       <h2 className="signup-header-text">회원가입</h2>
 
       <form onSubmit={handleSignupSubmit}>
-        {/* Name Input */}
-        <div className="form-group">
-          <label className="report-label">이름</label>
-          <div className="input-icon-wrapper">
-            <span className="input-left-icon"><User /></span>
-            <input
-              type="text"
-              className={`input-field ${signupNameError ? 'error' : ''}`}
-              placeholder="이름을 입력하세요"
-              value={signupName}
-              onChange={(e) => {
-                setSignupName(e.target.value);
-                if (signupNameError) setSignupNameError(e.target.value.trim() ? '' : '이름을 입력해주세요.');
-              }}
-            />
-          </div>
-          {signupNameError && <div className="error-message"><AlertCircle /> {signupNameError}</div>}
-        </div>
-
-        {/* Email Input */}
-        <div className="form-group">
-          <label className="report-label">이메일 주소</label>
-          <div className="input-icon-wrapper">
-            <span className="input-left-icon"><Email /></span>
-            <input
-              type="text"
-              className={`input-field ${signupEmailError ? 'error' : ''}`}
-              placeholder="이메일을 입력하세요"
-              value={signupEmail}
-              onChange={(e) => {
-                setSignupEmail(e.target.value);
-                if (signupEmailError) setSignupEmailError(validateEmail(e.target.value));
-              }}
-            />
-          </div>
-          {signupEmailError && <div className="error-message"><AlertCircle /> {signupEmailError}</div>}
-        </div>
-
-        {/* Password Input */}
-        <div className="form-group">
-          <label className="report-label">비밀번호</label>
-          <div className="input-icon-wrapper">
-            <span className="input-left-icon"><Lock /></span>
-            <input
-              type="password"
-              className={`input-field ${signupPasswordError ? 'error' : ''}`}
-              placeholder="6자 이상 입력하세요"
-              value={signupPassword}
-              onChange={(e) => {
-                setSignupPassword(e.target.value);
-                if (signupPasswordError) setSignupPasswordError(validatePassword(e.target.value));
-              }}
-            />
-          </div>
-          {signupPasswordError && <div className="error-message"><AlertCircle /> {signupPasswordError}</div>}
-        </div>
-
-        {/* Password Confirm Input */}
-        <div className="form-group">
-          <label className="report-label">비밀번호 확인</label>
-          <div className="input-icon-wrapper">
-            <span className="input-left-icon"><Lock /></span>
-            <input
-              type="password"
-              className={`input-field ${signupPasswordConfirmError ? 'error' : ''}`}
-              placeholder="비밀번호를 한번 더 입력하세요"
-              value={signupPasswordConfirm}
-              onChange={(e) => {
-                setSignupPasswordConfirm(e.target.value);
-                if (signupPasswordConfirmError) {
-                  setSignupPasswordConfirmError(e.target.value === signupPassword ? '' : '비밀번호가 일치하지 않습니다.');
-                }
-              }}
-            />
-          </div>
-          {signupPasswordConfirmError && <div className="error-message"><AlertCircle /> {signupPasswordConfirmError}</div>}
-        </div>
-
-        {/* Terms Agreement Checkbox */}
-        <label className="terms-checkbox">
-          <input
-            type="checkbox"
-            checked={termsAgreed}
-            onChange={(e) => setTermsAgreed(e.target.checked)}
+        <FormGroup label="이름" error={signupNameError}>
+          <InputField
+            icon={<User />}
+            type="text"
+            placeholder="이름을 입력하세요"
+            value={signupName}
+            onChange={(e) => {
+              setSignupName(e.target.value);
+              if (signupNameError) setSignupNameError(e.target.value.trim() ? '' : '이름을 입력해주세요.');
+            }}
           />
-          <span className="checkbox-custom">
-            <Check />
-          </span>
-          <span>
-            [필수] 이용약관 및 개인정보 처리방침에<br />
-            동의하고 안전 서비스에 동참하겠습니다.
-          </span>
-        </label>
+        </FormGroup>
 
-        {/* Register Button */}
-        <button
-          type="submit"
-          className="btn-primary"
-          disabled={isSignupLoading}
-        >
-          {isSignupLoading ? (
+        <FormGroup label="이메일 주소" error={signupEmailError}>
+          <InputField
+            icon={<Email />}
+            type="text"
+            placeholder="이메일을 입력하세요"
+            value={signupEmail}
+            onChange={(e) => {
+              setSignupEmail(e.target.value);
+              if (signupEmailError) setSignupEmailError(validateEmail(e.target.value));
+            }}
+          />
+        </FormGroup>
+
+        <FormGroup label="비밀번호" error={signupPasswordError}>
+          <InputField
+            icon={<Lock />}
+            type="password"
+            placeholder="6자 이상 입력하세요"
+            value={signupPassword}
+            onChange={(e) => {
+              setSignupPassword(e.target.value);
+              if (signupPasswordError) setSignupPasswordError(validatePassword(e.target.value));
+            }}
+          />
+        </FormGroup>
+
+        <FormGroup label="비밀번호 확인" error={signupPasswordConfirmError}>
+          <InputField
+            icon={<Lock />}
+            type="password"
+            placeholder="비밀번호를 한번 더 입력하세요"
+            value={signupPasswordConfirm}
+            onChange={(e) => {
+              setSignupPasswordConfirm(e.target.value);
+              if (signupPasswordConfirmError) {
+                setSignupPasswordConfirmError(e.target.value === signupPassword ? '' : '비밀번호가 일치하지 않습니다.');
+              }
+            }}
+          />
+        </FormGroup>
+
+        <Checkbox
+          checked={termsAgreed}
+          onChange={setTermsAgreed}
+          className="terms-checkbox"
+          label={
             <>
-              <span className="spinner" />
-              등록 중...
+              [필수] 이용약관 및 개인정보 처리방침에<br />
+              동의하고 안전 서비스에 동참하겠습니다.
             </>
-          ) : (
-            '가입하기'
-          )}
-        </button>
+          }
+        />
+
+        <Button type="submit" isLoading={isSignupLoading} loadingText="등록 중...">
+          가입하기
+        </Button>
       </form>
     </div>
   );
