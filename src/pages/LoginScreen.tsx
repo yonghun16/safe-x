@@ -5,9 +5,11 @@ import Button from '../components/ui/Button';
 import Checkbox from '../components/ui/Checkbox';
 import { FormGroup } from '../components/ui/FormError';
 import { validateEmail, validatePassword } from '../utils/validation';
+import { signInWithGoogle, signInWithEmail, resetPassword } from '../services/authService';
+import { getAuthErrorMessage } from '../utils/authErrors';
 
 interface LoginScreenProps {
-  onLoginSuccess: (email: string) => void;
+  onLoginSuccess: (email: string, name?: string) => void;
   onNavigateToSignup: () => void;
   showToast: (message: string, type?: 'success' | 'error') => void;
   rememberMe: boolean;
@@ -28,10 +30,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
   const [loginPassword, setLoginPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoginLoading, setIsLoginLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
-  const handleLoginSubmit = (e: FormEvent) => {
+  const handleLoginSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const eError = validateEmail(loginEmail);
     const pError = validatePassword(loginPassword);
@@ -45,17 +48,56 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
     }
 
     setIsLoginLoading(true);
-    setTimeout(() => {
+    try {
+      const result = await signInWithEmail(loginEmail, loginPassword, rememberMe);
+      const { user } = result;
+
+      onLoginSuccess(user.email ?? loginEmail, user.displayName ?? undefined);
+    } catch (error) {
+      showToast(getAuthErrorMessage(error), 'error');
+    } finally {
       setIsLoginLoading(false);
-      onLoginSuccess(loginEmail);
-    }, 1200);
+    }
   };
 
-  const handleSocialLogin = (platform: string) => {
-    showToast(`${platform} 간편 로그인에 성공했습니다.`);
-    const mockEmail = `safe-x-${platform.toLowerCase()}@email.com`;
-    setLoginEmail(mockEmail);
-    onLoginSuccess(mockEmail);
+  const handleForgotPassword = async () => {
+    const eError = validateEmail(loginEmail);
+    if (eError) {
+      setEmailError(eError);
+      showToast('비밀번호 재설정을 위해 이메일을 입력해주세요.', 'error');
+      return;
+    }
+
+    try {
+      await resetPassword(loginEmail);
+      showToast('비밀번호 재설정 이메일을 전송했습니다.');
+    } catch (error) {
+      showToast(getAuthErrorMessage(error), 'error');
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    if (isGoogleLoading) return;
+
+    setIsGoogleLoading(true);
+    try {
+      const result = await signInWithGoogle();
+      const { user } = result;
+
+      if (user.email) {
+        setLoginEmail(user.email);
+      }
+
+      onLoginSuccess(user.email ?? '', user.displayName ?? undefined);
+    } catch (error) {
+      showToast(getAuthErrorMessage(error), 'error');
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+  const handleUnsupportedSocialLogin = (platform: string) => {
+    showToast(`${platform} 로그인은 준비 중입니다.`, 'error');
   };
 
   return (
@@ -116,7 +158,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
             label="로그인 상태 유지"
           />
           <div className="forgot-links">
-            <a href="#forgot-pw" onClick={(e) => { e.preventDefault(); showToast('이메일 링크로 비밀번호 재설정을 전송했습니다.'); }}>비밀번호 찾기</a>
+            <a href="#forgot-pw" onClick={(e) => { e.preventDefault(); void handleForgotPassword(); }}>비밀번호 찾기</a>
             <span>|</span>
             <a href="#signup" onClick={(e) => { e.preventDefault(); onNavigateToSignup(); }}>회원가입</a>
           </div>
@@ -136,25 +178,33 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
 
         <div className="social-btn-container">
           <button
-            onClick={() => handleSocialLogin('Kakao')}
+            type="button"
+            onClick={() => handleUnsupportedSocialLogin('카카오')}
             className="social-circle-btn kakao"
             title="카카오 로그인"
+            disabled={isGoogleLoading || isLoginLoading}
           >
             <span style={{ fontWeight: '900', fontSize: '13px' }}>Talk</span>
           </button>
           <button
-            onClick={() => handleSocialLogin('Naver')}
+            type="button"
+            onClick={() => handleUnsupportedSocialLogin('네이버')}
             className="social-circle-btn naver"
             title="네이버 로그인"
+            disabled={isGoogleLoading || isLoginLoading}
           >
             <span style={{ fontWeight: '900', fontSize: '16px', fontFamily: 'serif' }}>N</span>
           </button>
           <button
-            onClick={() => handleSocialLogin('Google')}
+            type="button"
+            onClick={handleGoogleLogin}
             className="social-circle-btn google"
             title="구글 로그인"
+            disabled={isGoogleLoading || isLoginLoading}
           >
-            <span style={{ fontWeight: '800', fontSize: '14px', color: '#EA4335' }}>G</span>
+            <span style={{ fontWeight: '800', fontSize: '14px', color: '#EA4335' }}>
+              {isGoogleLoading ? '...' : 'G'}
+            </span>
           </button>
         </div>
       </div>

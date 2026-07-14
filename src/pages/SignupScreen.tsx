@@ -5,6 +5,8 @@ import Button from '../components/ui/Button';
 import Checkbox from '../components/ui/Checkbox';
 import { FormGroup } from '../components/ui/FormError';
 import { validateEmail, validatePassword } from '../utils/validation';
+import { signUpWithEmail } from '../services/authService';
+import { getAuthErrorMessage } from '../utils/authErrors';
 
 interface SignupScreenProps {
   onSignupSuccess: (email: string, name: string) => void;
@@ -29,7 +31,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
   const [signupPasswordError, setSignupPasswordError] = useState('');
   const [signupPasswordConfirmError, setSignupPasswordConfirmError] = useState('');
 
-  const handleSignupSubmit = (e: FormEvent) => {
+  const handleSignupSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     let isValid = true;
@@ -75,10 +77,16 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
     }
 
     setIsSignupLoading(true);
-    setTimeout(() => {
+    try {
+      const result = await signUpWithEmail(signupEmail, signupPassword, signupName);
+      const { user } = result;
+
+      onSignupSuccess(user.email ?? signupEmail, user.displayName ?? signupName);
+    } catch (error) {
+      showToast(getAuthErrorMessage(error), 'error');
+    } finally {
       setIsSignupLoading(false);
-      onSignupSuccess(signupEmail, signupName);
-    }, 1500);
+    }
   };
 
   return (
@@ -109,7 +117,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({
         <FormGroup label="이메일 주소" error={signupEmailError}>
           <InputField
             icon={<Email />}
-            type="text"
+            type="email"
             placeholder="이메일을 입력하세요"
             value={signupEmail}
             onChange={(e) => {
