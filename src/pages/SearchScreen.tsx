@@ -3,6 +3,7 @@ import { ChevronRight } from '../components/ui/Icons';
 import AppHeader from '../components/layout/AppHeader';
 import PageContainer from '../components/layout/PageContainer';
 import SearchInput from '../features/search/components/SearchInput';
+import PostImage from '../features/posts/components/PostImage';
 import { usePostStore } from '../store/usePostStore';
 import { useNavigationStore } from '../store/useNavigationStore';
 import { useToastStore } from '../store/useToastStore';
@@ -98,13 +99,13 @@ const SearchScreen: React.FC = () => {
                     cursor: 'pointer'
                   }}
                 >
-                  <div style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '6px',
-                    background: `linear-gradient(135deg, ${post.imageColor1} 0%, ${post.imageColor2} 100%)`,
-                    flexShrink: 0
-                  }} />
+                  <div style={{ width: '40px', height: '40px', borderRadius: '6px', overflow: 'hidden', flexShrink: 0 }}>
+                    <PostImage
+                      post={post}
+                      variant="thumbnail"
+                      style={{ width: '40px', height: '40px', borderRadius: '6px' }}
+                    />
+                  </div>
                   <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)' }}>{post.title}</span>
                     <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{post.location}</span>

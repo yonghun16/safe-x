@@ -1,8 +1,9 @@
 import React from 'react';
 import type { Post } from '../types';
-import { ChevronLeft, MoreIcon, ShieldSmall, MapPin, Heart, MessageCircle, Share } from '../components/ui/Icons';
+import { ChevronLeft, MoreIcon, MapPin, Heart, MessageCircle, Share } from '../components/ui/Icons';
 import AppHeader from '../components/layout/AppHeader';
 import DangerBadge from '../features/posts/components/DangerBadge';
+import PostImage from '../features/posts/components/PostImage';
 import CommentInput from '../features/comments/components/CommentInput';
 import CommentItem from '../features/comments/components/CommentItem';
 import { useNavigationStore } from '../store/useNavigationStore';
@@ -37,21 +38,11 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ post }) => {
         }
       />
 
-      <div
-        className="detail-img-banner"
-        style={{
-          background: `linear-gradient(135deg, ${post.imageColor1} 0%, ${post.imageColor2} 100%)`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '240px',
-          position: 'relative'
-        }}
-      >
-        <div className="hazard-stripes" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
-        <div style={{ transform: 'scale(1.8)', zIndex: 1 }}>
-          <ShieldSmall />
-        </div>
+      <div style={{ position: 'relative', height: '240px' }}>
+        <PostImage post={post} variant="banner" />
+        {!post.imageBase64 && (
+          <div className="hazard-stripes" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
+        )}
       </div>
 
       <div className="detail-content">

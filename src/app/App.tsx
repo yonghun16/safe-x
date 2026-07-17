@@ -52,6 +52,13 @@ export default function App() {
     return unsubscribe;
   }, [setUser, clearUser, setAuthReady]);
 
+  const initPostsSubscription = usePostStore((state) => state.initPostsSubscription);
+
+  useEffect(() => {
+    const unsubscribe = initPostsSubscription();
+    return unsubscribe;
+  }, [initPostsSubscription]);
+
   useEffect(() => {
     if (currentScreen === 'splash' && authReady) {
       const timer = setTimeout(() => {

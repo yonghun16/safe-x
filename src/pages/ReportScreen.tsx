@@ -1,34 +1,74 @@
-import React, { useState, type FormEvent } from 'react';
+import React, { useRef, useState, type FormEvent, type ChangeEvent } from 'react';
 import { Camera, MapPin } from '../components/ui/Icons';
 import Button from '../components/ui/Button';
 import AppHeader from '../components/layout/AppHeader';
 import PageContainer from '../components/layout/PageContainer';
+import PostImage from '../features/posts/components/PostImage';
 import { usePostStore } from '../store/usePostStore';
 import { useToastStore } from '../store/useToastStore';
+import { compressImageToBase64, estimateBase64SizeKB } from '../utils/image';
+
+const getDangerColors = (level: 'low' | 'medium' | 'high') => {
+  if (level === 'medium') {
+    return { imageColor1: '#FF9500', imageColor2: '#2C1B00' };
+  }
+  if (level === 'low') {
+    return { imageColor1: '#34C759', imageColor2: '#0B2D12' };
+  }
+  return { imageColor1: '#FF5C00', imageColor2: '#3A1200' };
+};
 
 const ReportScreen: React.FC = () => {
   const addPost = usePostStore((state) => state.addPost);
+  const isSubmitting = usePostStore((state) => state.isSubmitting);
   const showToast = useToastStore((state) => state.showToast);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [reportTitle, setReportTitle] = useState('');
   const [reportContent, setReportContent] = useState('');
   const [reportLocation, setReportLocation] = useState('');
   const [reportLevel, setReportLevel] = useState<'low' | 'medium' | 'high'>('high');
-  const [simulatedPhoto, setSimulatedPhoto] = useState<string | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [isPhotoLoading, setIsPhotoLoading] = useState(false);
 
-  const handlePhotoSelect = () => {
-    const colors = [
-      'linear-gradient(135deg, #FF6B00 0%, #FF1A00 100%)',
-      'linear-gradient(135deg, #FF8A00 0%, #D42100 100%)',
-      'linear-gradient(135deg, #FF9F1C 0%, #E71D36 100%)'
-    ];
-    const picked = colors[Math.floor(Math.random() * colors.length)];
-    setSimulatedPhoto(picked);
-    showToast('현장 사진이 성공적으로 선택되었습니다!');
+  const previewPost = {
+    imageBase64: imageBase64 ?? undefined,
+    ...getDangerColors(reportLevel),
   };
 
-  const handleReportSubmit = (e: FormEvent) => {
+  const handlePhotoSelect = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handlePhotoChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+
+    if (!file) return;
+
+    setIsPhotoLoading(true);
+    try {
+      const base64 = await compressImageToBase64(file);
+      const sizeKB = estimateBase64SizeKB(base64);
+
+      if (sizeKB > 900) {
+        showToast('이미지 용량이 너무 큽니다. 더 작은 사진을 선택해주세요.', 'error');
+        return;
+      }
+
+      setImageBase64(base64);
+      showToast('현장 사진이 선택되었습니다.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '사진 처리에 실패했습니다.';
+      showToast(message, 'error');
+    } finally {
+      setIsPhotoLoading(false);
+    }
+  };
+
+  const handleReportSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
     if (!reportTitle.trim()) {
       showToast('제목을 입력해주세요.', 'error');
       return;
@@ -41,31 +81,31 @@ const ReportScreen: React.FC = () => {
       showToast('위치를 입력해주세요.', 'error');
       return;
     }
-
-    let color1 = '#FF5C00';
-    let color2 = '#3A1200';
-    if (reportLevel === 'medium') {
-      color1 = '#FF9500';
-      color2 = '#2C1B00';
-    } else if (reportLevel === 'low') {
-      color1 = '#34C759';
-      color2 = '#0B2D12';
+    if (!imageBase64) {
+      showToast('사진을 선택해주세요.', 'error');
+      return;
     }
 
-    addPost({
-      title: reportTitle,
-      location: reportLocation,
-      description: reportContent,
-      dangerLevel: reportLevel,
-      imageColor1: color1,
-      imageColor2: color2
-    });
+    const colors = getDangerColors(reportLevel);
 
-    setReportTitle('');
-    setReportContent('');
-    setReportLocation('');
-    setReportLevel('high');
-    setSimulatedPhoto(null);
+    try {
+      await addPost({
+        title: reportTitle.trim(),
+        location: reportLocation.trim(),
+        description: reportContent.trim(),
+        dangerLevel: reportLevel,
+        imageBase64,
+        ...colors,
+      });
+
+      setReportTitle('');
+      setReportContent('');
+      setReportLocation('');
+      setReportLevel('high');
+      setImageBase64(null);
+    } catch {
+      // Toast is handled in store
+    }
   };
 
   return (
@@ -75,16 +115,29 @@ const ReportScreen: React.FC = () => {
       <form onSubmit={handleReportSubmit} className="report-container">
         <div className="report-section">
           <label className="report-label">사진 업로드</label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            style={{ display: 'none' }}
+            onChange={handlePhotoChange}
+          />
           <div className="upload-box" onClick={handlePhotoSelect}>
-            {simulatedPhoto ? (
+            {imageBase64 ? (
               <div className="upload-preview">
-                <div style={{ width: '100%', height: '100%', background: simulatedPhoto }} />
-                <div className="upload-preview-overlay">사진 교체하기</div>
+                <PostImage
+                  post={previewPost}
+                  style={{ width: '100%', height: '100%' }}
+                />
+                <div className="upload-preview-overlay">
+                  {isPhotoLoading ? '처리 중...' : '사진 교체하기'}
+                </div>
               </div>
             ) : (
               <>
                 <Camera />
-                <span>사진 선택</span>
+                <span>{isPhotoLoading ? '사진 처리 중...' : '사진 선택'}</span>
               </>
             )}
           </div>
@@ -145,7 +198,9 @@ const ReportScreen: React.FC = () => {
           </div>
         </div>
 
-        <Button type="submit">등록하기</Button>
+        <Button type="submit" isLoading={isSubmitting} loadingText="등록 중...">
+          등록하기
+        </Button>
       </form>
     </PageContainer>
   );

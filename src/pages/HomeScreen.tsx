@@ -10,6 +10,7 @@ import { useToastStore } from '../store/useToastStore';
 
 const HomeScreen: React.FC = () => {
   const posts = usePostStore((state) => state.posts);
+  const isLoading = usePostStore((state) => state.isLoading);
   const homeTab = usePostStore((state) => state.homeTab);
   const searchQuery = usePostStore((state) => state.searchQuery);
   const setHomeTab = usePostStore((state) => state.setHomeTab);
@@ -46,7 +47,11 @@ const HomeScreen: React.FC = () => {
       <FeedTabs activeTab={homeTab} onTabChange={setHomeTab} />
 
       <div className="feed-list" style={{ paddingBottom: '88px' }}>
-        {sortedPosts.length === 0 ? (
+        {isLoading ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)', fontSize: '14px' }}>
+            제보 목록을 불러오는 중...
+          </div>
+        ) : sortedPosts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)', fontSize: '14px' }}>
             제보된 내역이 없습니다.
           </div>

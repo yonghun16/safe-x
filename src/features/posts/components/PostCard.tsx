@@ -1,6 +1,7 @@
 import type { Post } from '../../../types';
-import { ShieldSmall, MapPin, Heart, MessageCircle } from '../../../components/ui/Icons';
+import { MapPin, Heart, MessageCircle } from '../../../components/ui/Icons';
 import DangerBadge from './DangerBadge';
+import PostImage from './PostImage';
 
 interface PostCardProps {
   post: Post;
@@ -14,15 +15,7 @@ const PostCard = ({ post, onClick }: PostCardProps) => {
       onClick={() => onClick(post.id)}
     >
       <div className="post-card-img-wrapper">
-        <div
-          className="post-card-img-placeholder"
-          style={{
-            background: `linear-gradient(135deg, ${post.imageColor1} 0%, ${post.imageColor2} 100%)`
-          }}
-        >
-          <div className="hazard-stripes" />
-          <ShieldSmall />
-        </div>
+        <PostImage post={post} />
         <DangerBadge level={post.dangerLevel} />
       </div>
       <div className="post-card-content">

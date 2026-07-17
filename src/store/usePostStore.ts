@@ -1,58 +1,60 @@
 import { create } from 'zustand';
 import type { Post } from '../types';
-import { INITIAL_POSTS } from '../constants/mockPosts';
+import { createPost, subscribePosts, type CreatePostInput } from '../services/postService';
 import { useNavigationStore } from './useNavigationStore';
 import { useToastStore } from './useToastStore';
-
-interface NewPostData {
-  title: string;
-  location: string;
-  description: string;
-  dangerLevel: 'high' | 'medium' | 'low';
-  imageColor1: string;
-  imageColor2: string;
-}
 
 interface PostStore {
   posts: Post[];
   homeTab: 'new' | 'popular';
   searchQuery: string;
+  isLoading: boolean;
+  isSubmitting: boolean;
   setHomeTab: (tab: 'new' | 'popular') => void;
   setSearchQuery: (query: string) => void;
   resetSearchQuery: () => void;
-  addPost: (postData: NewPostData) => void;
+  initPostsSubscription: () => () => void;
+  addPost: (postData: CreatePostInput) => Promise<void>;
   toggleLike: (postId: string) => void;
   addComment: (postId: string, commentText: string, authorName: string) => void;
   navigateToSearchWithUser: (userName: string) => void;
 }
 
 export const usePostStore = create<PostStore>((set) => ({
-  posts: INITIAL_POSTS,
+  posts: [],
   homeTab: 'new',
   searchQuery: '',
+  isLoading: true,
+  isSubmitting: false,
 
   setHomeTab: (tab) => set({ homeTab: tab }),
   setSearchQuery: (query) => set({ searchQuery: query }),
   resetSearchQuery: () => set({ searchQuery: '' }),
 
-  addPost: (postData) => {
-    const newPost: Post = {
-      id: `post-${Date.now()}`,
-      title: postData.title,
-      location: postData.location,
-      time: '방금 전',
-      dangerLevel: postData.dangerLevel,
-      likes: 0,
-      commentsCount: 0,
-      description: postData.description,
-      imageColor1: postData.imageColor1,
-      imageColor2: postData.imageColor2,
-      comments: [],
-    };
+  initPostsSubscription: () => {
+    set({ isLoading: true });
 
-    set((state) => ({ posts: [newPost, ...state.posts] }));
-    useToastStore.getState().showToast('제보가 성공적으로 등록되었습니다!');
-    useNavigationStore.getState().setScreen('home');
+    const unsubscribe = subscribePosts((posts) => {
+      set({ posts, isLoading: false });
+    });
+
+    return unsubscribe;
+  },
+
+  addPost: async (postData) => {
+    set({ isSubmitting: true });
+
+    try {
+      await createPost(postData);
+      useToastStore.getState().showToast('제보가 성공적으로 등록되었습니다!');
+      useNavigationStore.getState().setScreen('home');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '제보 등록에 실패했습니다.';
+      useToastStore.getState().showToast(message, 'error');
+      throw error;
+    } finally {
+      set({ isSubmitting: false });
+    }
   },
 
   toggleLike: (postId) => {
@@ -100,4 +102,4 @@ export const usePostStore = create<PostStore>((set) => ({
   },
 }));
 
-export type { NewPostData };
+export type { CreatePostInput as NewPostData };

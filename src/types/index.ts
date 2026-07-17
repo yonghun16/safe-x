@@ -49,11 +49,23 @@ export interface Post {
   /** 게시글 내용 */
   description: string;
 
+  /** BASE64 인코딩된 대표 이미지 (data URL) */
+  imageBase64?: string;
+
   /** 대표 이미지의 첫 번째 배경색 */
   imageColor1: string;
 
   /** 대표 이미지의 두 번째 배경색 */
   imageColor2: string;
+
+  /** 게시글 작성자 ID */
+  authorId?: string;
+
+  /** 게시글 작성자 이름 */
+  authorName?: string;
+
+  /** ISO 형식 작성 시간 */
+  createdAt?: string;
 
   /** 게시글에 작성된 댓글 목록 */
   comments: Comment[];
