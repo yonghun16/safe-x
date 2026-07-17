@@ -19,6 +19,7 @@ import SignupScreen from '../pages/SignupScreen';
 import HomeScreen from '../pages/HomeScreen';
 import DetailScreen from '../pages/DetailScreen';
 import ReportScreen from '../pages/ReportScreen';
+import EditScreen from '../pages/EditScreen';
 import SearchScreen from '../pages/SearchScreen';
 import MyPageScreen from '../pages/MyPageScreen';
 
@@ -116,6 +117,7 @@ export default function App() {
         {currentScreen === 'home' && <HomeScreen />}
         {currentScreen === 'detail' && selectedPost && <DetailScreen post={selectedPost} />}
         {currentScreen === 'report' && <ReportScreen />}
+        {currentScreen === 'edit' && <EditScreen />}
         {currentScreen === 'search' && <SearchScreen />}
         {currentScreen === 'mypage' && (
           <MyPageScreen onLogout={handleLogout} />

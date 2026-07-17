@@ -1,6 +1,9 @@
 import {
   addDoc,
   collection,
+  doc,
+  deleteDoc,
+  updateDoc,
   onSnapshot,
   orderBy,
   query,
@@ -124,4 +127,29 @@ export const subscribePosts = (onChange: (posts: Post[]) => void): (() => void) 
       onChange([]);
     }
   );
+};
+
+export const updatePost = async (postId: string, input: Partial<CreatePostInput>): Promise<void> => {
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error('로그인이 필요합니다.');
+  }
+
+  const postRef = doc(db, POSTS_COLLECTION, postId);
+  await updateDoc(postRef, {
+    ...input,
+    updatedAt: serverTimestamp(),
+  });
+};
+
+export const deletePost = async (postId: string): Promise<void> => {
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error('로그인이 필요합니다.');
+  }
+
+  const postRef = doc(db, POSTS_COLLECTION, postId);
+  await deleteDoc(postRef);
 };

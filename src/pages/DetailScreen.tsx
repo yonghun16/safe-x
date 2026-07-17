@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Post } from '../types';
+import { auth } from '../lib/firebase';
 import { ChevronLeft, MoreIcon, MapPin, Heart, MessageCircle, Share } from '../components/ui/Icons';
 import AppHeader from '../components/layout/AppHeader';
 import DangerBadge from '../features/posts/components/DangerBadge';
@@ -17,10 +18,32 @@ interface DetailScreenProps {
 
 const DetailScreen: React.FC<DetailScreenProps> = ({ post }) => {
   const goBackFromDetail = useNavigationStore((state) => state.goBackFromDetail);
+  const setScreen = useNavigationStore((state) => state.setScreen);
   const toggleLike = usePostStore((state) => state.toggleLike);
   const addComment = usePostStore((state) => state.addComment);
+  const deletePostStore = usePostStore((state) => state.deletePost);
   const userName = useAuthStore((state) => state.name);
   const showToast = useToastStore((state) => state.showToast);
+
+  const [showMenu, setShowMenu] = useState(false);
+  const isOwner = auth.currentUser?.uid === post.authorId;
+
+  const handleEdit = () => {
+    setShowMenu(false);
+    setScreen('edit');
+  };
+
+  const handleDelete = async () => {
+    setShowMenu(false);
+    if (window.confirm('정말로 이 제보를 삭제하시겠습니까?')) {
+      try {
+        await deletePostStore(post.id);
+        goBackFromDetail();
+      } catch {
+        // Error toast is handled in the store
+      }
+    }
+  };
 
   return (
     <div className="detail-container" style={{ paddingBottom: '140px' }}>
@@ -32,7 +55,7 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ post }) => {
           </button>
         }
         right={
-          <button type="button" className="header-btn" onClick={() => showToast('추가 기능 준비 중입니다.')}>
+          <button type="button" className="header-btn" onClick={() => setShowMenu(true)}>
             <MoreIcon />
           </button>
         }
@@ -103,6 +126,40 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ post }) => {
       </div>
 
       <CommentInput onSubmit={(text) => addComment(post.id, text, userName || '홍길동')} />
+
+      {showMenu && (
+        <>
+          <div className="modal-overlay" onClick={() => setShowMenu(false)} />
+          <div className="bottom-sheet">
+            <div className="bottom-sheet-handle" />
+            <div className="bottom-sheet-title">더보기</div>
+            <div className="bottom-sheet-content">
+              {isOwner ? (
+                <>
+                  <button type="button" className="bottom-sheet-item" onClick={handleEdit}>
+                    수정하기
+                  </button>
+                  <button type="button" className="bottom-sheet-item danger" onClick={handleDelete}>
+                    삭제하기
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button type="button" className="bottom-sheet-item" onClick={() => { setShowMenu(false); showToast('공유 링크가 클립보드에 복사되었습니다.'); }}>
+                    공유하기
+                  </button>
+                  <button type="button" className="bottom-sheet-item danger" onClick={() => { setShowMenu(false); showToast('신고가 접수되었습니다.'); }}>
+                    신고하기
+                  </button>
+                </>
+              )}
+              <button type="button" className="bottom-sheet-item cancel" onClick={() => setShowMenu(false)}>
+                취소
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

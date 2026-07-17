@@ -5,5 +5,6 @@ export type Screen =
   | 'home'
   | 'detail'
   | 'report'
+  | 'edit'
   | 'search'
   | 'mypage';

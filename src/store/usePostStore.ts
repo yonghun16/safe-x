@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import type { Post } from '../types';
-import { createPost, subscribePosts, type CreatePostInput } from '../services/postService';
+import {
+  createPost,
+  subscribePosts,
+  updatePost,
+  deletePost,
+  type CreatePostInput,
+} from '../services/postService';
 import { useNavigationStore } from './useNavigationStore';
 import { useToastStore } from './useToastStore';
 
@@ -15,6 +21,8 @@ interface PostStore {
   resetSearchQuery: () => void;
   initPostsSubscription: () => () => void;
   addPost: (postData: CreatePostInput) => Promise<void>;
+  updatePost: (postId: string, postData: Partial<CreatePostInput>) => Promise<void>;
+  deletePost: (postId: string) => Promise<void>;
   toggleLike: (postId: string) => void;
   addComment: (postId: string, commentText: string, authorName: string) => void;
   navigateToSearchWithUser: (userName: string) => void;
@@ -50,6 +58,38 @@ export const usePostStore = create<PostStore>((set) => ({
       useNavigationStore.getState().setScreen('home');
     } catch (error) {
       const message = error instanceof Error ? error.message : '제보 등록에 실패했습니다.';
+      useToastStore.getState().showToast(message, 'error');
+      throw error;
+    } finally {
+      set({ isSubmitting: false });
+    }
+  },
+
+  updatePost: async (postId, postData) => {
+    set({ isSubmitting: true });
+
+    try {
+      await updatePost(postId, postData);
+      useToastStore.getState().showToast('제보가 성공적으로 수정되었습니다!');
+      useNavigationStore.getState().setScreen('home');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '제보 수정에 실패했습니다.';
+      useToastStore.getState().showToast(message, 'error');
+      throw error;
+    } finally {
+      set({ isSubmitting: false });
+    }
+  },
+
+  deletePost: async (postId) => {
+    set({ isSubmitting: true });
+
+    try {
+      await deletePost(postId);
+      useToastStore.getState().showToast('제보가 성공적으로 삭제되었습니다!');
+      useNavigationStore.getState().setScreen('home');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '제보 삭제에 실패했습니다.';
       useToastStore.getState().showToast(message, 'error');
       throw error;
     } finally {
