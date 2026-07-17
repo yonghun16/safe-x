@@ -1,5 +1,5 @@
 import { AlertCircle } from "../ui/Icons";
-import type { ToastState } from "../../hooks/useToast";
+import type { ToastState } from "../../store/useToastStore";
 
 interface ToastProps {
   toast: ToastState;

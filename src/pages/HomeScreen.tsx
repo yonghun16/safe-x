@@ -1,28 +1,21 @@
 import React from 'react';
-import type { Post } from '../types';
 import { ShieldSmall, Bell } from '../components/ui/Icons';
 import AppHeader from '../components/layout/AppHeader';
 import PageContainer from '../components/layout/PageContainer';
 import FeedTabs from '../features/posts/components/FeedTabs';
 import PostCard from '../features/posts/components/PostCard';
+import { usePostStore } from '../store/usePostStore';
+import { useNavigationStore } from '../store/useNavigationStore';
+import { useToastStore } from '../store/useToastStore';
 
-interface HomeScreenProps {
-  posts: Post[];
-  homeTab: 'new' | 'popular';
-  setHomeTab: (tab: 'new' | 'popular') => void;
-  onSelectPost: (id: string) => void;
-  showToast: (message: string, type?: 'success' | 'error') => void;
-  searchQuery: string;
-}
+const HomeScreen: React.FC = () => {
+  const posts = usePostStore((state) => state.posts);
+  const homeTab = usePostStore((state) => state.homeTab);
+  const searchQuery = usePostStore((state) => state.searchQuery);
+  const setHomeTab = usePostStore((state) => state.setHomeTab);
+  const goToDetail = useNavigationStore((state) => state.goToDetail);
+  const showToast = useToastStore((state) => state.showToast);
 
-const HomeScreen: React.FC<HomeScreenProps> = ({
-  posts,
-  homeTab,
-  setHomeTab,
-  onSelectPost,
-  showToast,
-  searchQuery
-}) => {
   const filteredPosts = posts.filter(post =>
     post.title.includes(searchQuery) ||
     post.location.includes(searchQuery) ||
@@ -59,7 +52,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
           </div>
         ) : (
           sortedPosts.map((post) => (
-            <PostCard key={post.id} post={post} onClick={onSelectPost} />
+            <PostCard key={post.id} post={post} onClick={goToDetail} />
           ))
         )}
       </div>

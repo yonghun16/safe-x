@@ -2,22 +2,20 @@ import React from 'react';
 import { Bell, User, ChevronRight } from '../components/ui/Icons';
 import AppHeader from '../components/layout/AppHeader';
 import PageContainer from '../components/layout/PageContainer';
+import { useAuthStore } from '../store/useAuthStore';
+import { usePostStore } from '../store/usePostStore';
+import { useToastStore } from '../store/useToastStore';
 
 interface MyPageScreenProps {
-  userName: string;
-  email: string;
   onLogout: () => void;
-  showToast: (message: string, type?: 'success' | 'error') => void;
-  onNavigateToSearchWithUser: (userName: string) => void;
 }
 
-const MyPageScreen: React.FC<MyPageScreenProps> = ({
-  userName,
-  email,
-  onLogout,
-  showToast,
-  onNavigateToSearchWithUser
-}) => {
+const MyPageScreen: React.FC<MyPageScreenProps> = ({ onLogout }) => {
+  const userName = useAuthStore((state) => state.name);
+  const email = useAuthStore((state) => state.email);
+  const navigateToSearchWithUser = usePostStore((state) => state.navigateToSearchWithUser);
+  const showToast = useToastStore((state) => state.showToast);
+
   const finalName = userName || '홍길동';
   const finalEmail = email || 'hong@email.com';
 
@@ -45,7 +43,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({
         </div>
 
         <div className="profile-menu">
-          <button type="button" className="profile-menu-item" onClick={() => onNavigateToSearchWithUser(finalName)}>
+          <button type="button" className="profile-menu-item" onClick={() => navigateToSearchWithUser(finalName)}>
             <div className="profile-menu-item-left">
               <User />
               <span>내 게시물</span>

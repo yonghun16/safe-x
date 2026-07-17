@@ -7,18 +7,19 @@ import { FormGroup } from '../components/ui/FormError';
 import { validateEmail, validatePassword } from '../utils/validation';
 import { signUpWithEmail } from '../services/authService';
 import { getAuthErrorMessage } from '../utils/authErrors';
+import { useToastStore } from '../store/useToastStore';
 
 interface SignupScreenProps {
   onSignupSuccess: (email: string, name: string) => void;
   onNavigateToLogin: () => void;
-  showToast: (message: string, type?: 'success' | 'error') => void;
 }
 
 const SignupScreen: React.FC<SignupScreenProps> = ({
   onSignupSuccess,
   onNavigateToLogin,
-  showToast
 }) => {
+  const showToast = useToastStore((state) => state.showToast);
+
   const [signupName, setSignupName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');

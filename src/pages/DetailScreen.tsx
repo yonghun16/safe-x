@@ -5,28 +5,28 @@ import AppHeader from '../components/layout/AppHeader';
 import DangerBadge from '../features/posts/components/DangerBadge';
 import CommentInput from '../features/comments/components/CommentInput';
 import CommentItem from '../features/comments/components/CommentItem';
+import { useNavigationStore } from '../store/useNavigationStore';
+import { usePostStore } from '../store/usePostStore';
+import { useAuthStore } from '../store/useAuthStore';
+import { useToastStore } from '../store/useToastStore';
 
 interface DetailScreenProps {
   post: Post;
-  onBack: () => void;
-  onLikeToggle: (id: string) => void;
-  onAddComment: (postId: string, commentText: string) => void;
-  showToast: (message: string, type?: 'success' | 'error') => void;
 }
 
-const DetailScreen: React.FC<DetailScreenProps> = ({
-  post,
-  onBack,
-  onLikeToggle,
-  onAddComment,
-  showToast
-}) => {
+const DetailScreen: React.FC<DetailScreenProps> = ({ post }) => {
+  const goBackFromDetail = useNavigationStore((state) => state.goBackFromDetail);
+  const toggleLike = usePostStore((state) => state.toggleLike);
+  const addComment = usePostStore((state) => state.addComment);
+  const userName = useAuthStore((state) => state.name);
+  const showToast = useToastStore((state) => state.showToast);
+
   return (
     <div className="detail-container" style={{ paddingBottom: '140px' }}>
       <AppHeader
         title="게시글 상세"
         left={
-          <button type="button" className="header-btn" onClick={onBack}>
+          <button type="button" className="header-btn" onClick={goBackFromDetail}>
             <ChevronLeft />
           </button>
         }
@@ -77,7 +77,7 @@ const DetailScreen: React.FC<DetailScreenProps> = ({
           <div style={{ display: 'flex', gap: '16px' }}>
             <button
               type="button"
-              onClick={() => onLikeToggle(post.id)}
+              onClick={() => toggleLike(post.id)}
               className="action-share-btn"
               style={{ border: 'none', background: 'none' }}
             >
@@ -111,7 +111,7 @@ const DetailScreen: React.FC<DetailScreenProps> = ({
         )}
       </div>
 
-      <CommentInput onSubmit={(text) => onAddComment(post.id, text)} />
+      <CommentInput onSubmit={(text) => addComment(post.id, text, userName || '홍길동')} />
     </div>
   );
 };

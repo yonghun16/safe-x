@@ -3,20 +3,13 @@ import { Camera, MapPin } from '../components/ui/Icons';
 import Button from '../components/ui/Button';
 import AppHeader from '../components/layout/AppHeader';
 import PageContainer from '../components/layout/PageContainer';
+import { usePostStore } from '../store/usePostStore';
+import { useToastStore } from '../store/useToastStore';
 
-interface ReportScreenProps {
-  onAddPost: (post: {
-    title: string;
-    location: string;
-    description: string;
-    dangerLevel: 'high' | 'medium' | 'low';
-    imageColor1: string;
-    imageColor2: string;
-  }) => void;
-  showToast: (message: string, type?: 'success' | 'error') => void;
-}
+const ReportScreen: React.FC = () => {
+  const addPost = usePostStore((state) => state.addPost);
+  const showToast = useToastStore((state) => state.showToast);
 
-const ReportScreen: React.FC<ReportScreenProps> = ({ onAddPost, showToast }) => {
   const [reportTitle, setReportTitle] = useState('');
   const [reportContent, setReportContent] = useState('');
   const [reportLocation, setReportLocation] = useState('');
@@ -59,7 +52,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ onAddPost, showToast }) => 
       color2 = '#0B2D12';
     }
 
-    onAddPost({
+    addPost({
       title: reportTitle,
       location: reportLocation,
       description: reportContent,

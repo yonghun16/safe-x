@@ -7,26 +7,24 @@ import { FormGroup } from '../components/ui/FormError';
 import { validateEmail, validatePassword } from '../utils/validation';
 import { signInWithGoogle, signInWithEmail, resetPassword } from '../services/authService';
 import { getAuthErrorMessage } from '../utils/authErrors';
+import { useAuthStore } from '../store/useAuthStore';
+import { useToastStore } from '../store/useToastStore';
 
 interface LoginScreenProps {
   onLoginSuccess: (email: string, name?: string) => void;
   onNavigateToSignup: () => void;
-  showToast: (message: string, type?: 'success' | 'error') => void;
-  rememberMe: boolean;
-  setRememberMe: (val: boolean) => void;
-  loginEmail: string;
-  setLoginEmail: (val: string) => void;
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({
   onLoginSuccess,
   onNavigateToSignup,
-  showToast,
-  rememberMe,
-  setRememberMe,
-  loginEmail,
-  setLoginEmail
 }) => {
+  const loginEmail = useAuthStore((state) => state.email);
+  const rememberMe = useAuthStore((state) => state.rememberMe);
+  const setLoginEmail = useAuthStore((state) => state.setLoginEmail);
+  const setRememberMe = useAuthStore((state) => state.setRememberMe);
+  const showToast = useToastStore((state) => state.showToast);
+
   const [loginPassword, setLoginPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoginLoading, setIsLoginLoading] = useState(false);

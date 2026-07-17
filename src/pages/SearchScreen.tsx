@@ -1,25 +1,19 @@
 import React from 'react';
-import type { Post } from '../types';
 import { ChevronRight } from '../components/ui/Icons';
 import AppHeader from '../components/layout/AppHeader';
 import PageContainer from '../components/layout/PageContainer';
 import SearchInput from '../features/search/components/SearchInput';
+import { usePostStore } from '../store/usePostStore';
+import { useNavigationStore } from '../store/useNavigationStore';
+import { useToastStore } from '../store/useToastStore';
 
-interface SearchScreenProps {
-  posts: Post[];
-  searchQuery: string;
-  setSearchQuery: (val: string) => void;
-  onSelectPost: (id: string) => void;
-  showToast: (message: string, type?: 'success' | 'error') => void;
-}
+const SearchScreen: React.FC = () => {
+  const posts = usePostStore((state) => state.posts);
+  const searchQuery = usePostStore((state) => state.searchQuery);
+  const setSearchQuery = usePostStore((state) => state.setSearchQuery);
+  const goToDetail = useNavigationStore((state) => state.goToDetail);
+  const showToast = useToastStore((state) => state.showToast);
 
-const SearchScreen: React.FC<SearchScreenProps> = ({
-  posts,
-  searchQuery,
-  setSearchQuery,
-  onSelectPost,
-  showToast
-}) => {
   const filteredPosts = posts.filter(post =>
     post.title.includes(searchQuery) ||
     post.location.includes(searchQuery) ||
@@ -94,7 +88,7 @@ const SearchScreen: React.FC<SearchScreenProps> = ({
               {filteredPosts.map(post => (
                 <div
                   key={post.id}
-                  onClick={() => onSelectPost(post.id)}
+                  onClick={() => goToDetail(post.id)}
                   style={{
                     display: 'flex',
                     gap: '12px',
