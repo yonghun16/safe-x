@@ -14,7 +14,6 @@ import { useToast } from '../hooks/useToast';
 import DeviceFrame from '../components/layout/DeviceFrame';
 import StatusBar from '../components/layout/StatusBar';
 import Toast from '../components/layout/Toast';
-import HomeIndicator from '../components/layout/HomeIndicator';
 import BottomNav from '../components/layout/BottomNav';
 
 // =========================
@@ -40,6 +39,7 @@ export default function App() {
   const [rememberMe, setRememberMe] = useState(false);
   const [homeTab, setHomeTab] = useState<'new' | 'popular'>('new');
   const [authReady, setAuthReady] = useState(false);
+  const isSplash = currentScreen === 'splash';
   const { toast, showToast } = useToast();
 
   useEffect(() => {
@@ -59,15 +59,14 @@ export default function App() {
 
 
   /**
-   * Splash 화면을 제어하는 Effect
+   * Splash 화면을 일정 시간 표시한 뒤 다음 화면으로 전환한다.
    *
-   * currentScreen이 변경될 때마다 실행된다.
+   * @remarks
+   * 인증 상태(authReady)가 준비되면 1.8초 동안 Splash 화면을
+   * 유지한 후 로그인 여부에 따라 Home 또는 Login 화면으로 이동한다.
    *
-   * 동작 순서
-   * 1. 현재 화면이 splash인지 확인
-   * 2. 1.8초 후 login 화면으로 변경
-   * 3. 컴포넌트가 사라지거나 Effect가 다시 실행되면
-   *    예약된 타이머를 제거한다.
+   * Effect가 다시 실행되거나 컴포넌트가 언마운트되면
+   * 예약된 타이머를 정리한다.
    */
   useEffect(() => {
     if (currentScreen === 'splash' && authReady) {
@@ -84,7 +83,7 @@ export default function App() {
    *
    * @param email 로그인한 사용자의 이메일
    *
-   * 수행 작업
+   * @remarks
    * - 로그인 이메일 저장
    * - 성공 Toast 출력
    * - Home 화면으로 이동
@@ -104,7 +103,7 @@ export default function App() {
    * @param email 회원 이메일
    * @param name 회원 이름
    *
-   * 수행 작업
+   * @remarks
    * - 회원 정보 저장
    * - 회원가입 완료 Toast 출력
    * - Login 화면으로 이동
@@ -121,7 +120,7 @@ export default function App() {
    *
    * @param postData 사용자가 입력한 게시글 정보
    *
-   * 수행 작업
+   * @remarks
    * - 새로운 Post 객체 생성
    * - 게시글 목록 맨 앞에 추가
    * - 성공 Toast 출력
@@ -160,7 +159,7 @@ export default function App() {
    *
    * @param postId 좋아요를 변경할 게시글 ID
    *
-   * 동작
+   * @remarks
    * - 게시글을 찾는다.
    * - 이미 좋아요를 눌렀다면 취소한다.
    * - 좋아요 수를 증감한다.
@@ -194,7 +193,7 @@ export default function App() {
    * @param postId 댓글을 추가할 게시글의 ID
    * @param commentText 사용자가 입력한 댓글 내용
    *
-   * 동작 순서
+   * @remarks
    * 1. 게시글 목록을 순회하여 대상 게시글을 찾는다.
    * 2. 새로운 Comment 객체를 생성한다.
    * 3. 기존 comments 배열 뒤에 새 댓글을 추가한다.
@@ -232,15 +231,12 @@ export default function App() {
   };
 
   /**
-   * 로그아웃을 처리한다.
+   * 사용자를 로그아웃한다.
    *
-   * 동작
-   * - 로그아웃 안내 Toast를 표시한다.
-   * - 로그인 화면으로 이동한다.
-   *
-   * Note
-   * 실제 서비스라면 토큰 삭제(LocalStorage, Cookie),
-   * 사용자 정보 초기화 등의 작업도 함께 수행한다.
+   * @remarks
+   * - Firebase 인증에서 로그아웃을 수행한다.
+   * - 성공하면 성공 메시지를 표시하고 로그인 화면으로 이동한다.
+   * - 실패하면 오류 메시지를 표시한다.
    */
   const handleLogout = async () => {
     try {
@@ -256,10 +252,6 @@ export default function App() {
    * 특정 사용자의 게시글을 검색하도록 Search 화면으로 이동한다.
    *
    * @param userName 검색할 사용자 이름
-   *
-   * 동작
-   * - 검색어를 사용자 이름으로 설정한다.
-   * - Search 화면으로 이동한다.
    */
   const handleNavigateToSearchWithUser = (userName: string) => {
     setSearchQuery(userName);
@@ -291,24 +283,10 @@ export default function App() {
    * App 컴포넌트가 화면 전환을 직접 관리하는 구조이다.
    */
   return (
-    /**
-     * 애플리케이션의 최상위 레이아웃
-     *
-     * 화면 구성
-     * ┌──────────────────────┐
-     * │ StatusBar            │
-     * │ Toast (조건부)       │
-     * │                      │
-     * │ 현재 Screen          │
-     * │                      │
-     * │ HomeIndicator        │
-     * │ BottomNav            │
-     * └──────────────────────┘
-     */
     <DeviceFrame>
 
       {/* 상단 상태바 (Splash에서는 Dark, 나머지는 Light) */}
-      <StatusBar variant={currentScreen === 'splash' ? 'dark' : 'light'} />
+      {!isSplash && <StatusBar variant="light" />}
 
       {/* Toast가 존재할 때만 렌더링 */}
       {toast && <Toast toast={toast} />}
@@ -403,9 +381,6 @@ export default function App() {
         )}
 
       </div>
-
-      {/* iPhone Home Indicator */}
-      <HomeIndicator />
 
       {/* 하단 네비게이션 */}
       <BottomNav

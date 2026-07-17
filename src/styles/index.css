@@ -1,32 +1,33 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 
 :root {
-  --primary: #FF7622;
-  --primary-hover: #E65F10;
+  --primary: #ff7622;
+  --primary-hover: #e65f10;
   --primary-bg: rgba(255, 118, 34, 0.1);
   --primary-border: rgba(255, 118, 34, 0.3);
-  
-  --bg-app: #FFFFFF;
-  --bg-gray: #F7F8FA;
-  --border-color: #EBECEF;
-  
-  --text-primary: #1F2024;
-  --text-secondary: #5F626B;
-  --text-muted: #9CA3AF;
-  
-  --danger: #FF3B30;
-  --danger-bg: #FFF0EE;
-  --warning: #FF9500;
-  --warning-bg: #FFF5EC;
-  --success: #34C759;
-  --success-bg: #E8F9EE;
-  
+
+  --bg-app: #ffffff;
+  --bg-gray: #f7f8fa;
+  --border-color: #ebecef;
+
+  --text-primary: #1f2024;
+  --text-secondary: #5f626b;
+  --text-muted: #9ca3af;
+
+  --danger: #ff3b30;
+  --danger-bg: #fff0ee;
+  --warning: #ff9500;
+  --warning-bg: #fff5ec;
+  --success: #34c759;
+  --success-bg: #e8f9ee;
+
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
-  
-  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  
+
+  --font-sans:
+    "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -62,10 +63,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #EBECEF;
+  background: #ebecef;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #D1D5DB;
+  background: #d1d5db;
 }
