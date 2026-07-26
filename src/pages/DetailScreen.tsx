@@ -80,6 +80,8 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ post }) => {
             <span>{post.location}</span>
           </div>
           <span>|</span>
+          <span>작성자: {post.authorName || '익명'}</span>
+          <span>|</span>
           <span>{post.time}</span>
           <span>|</span>
           <span>조회 52</span>

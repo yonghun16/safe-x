@@ -13,6 +13,7 @@ import {
 import { auth, db } from '../lib/firebase';
 import type { Comment, Post } from '../types';
 import { formatRelativeTime } from '../utils/formatTime';
+import { useAuthStore } from '../store/useAuthStore';
 
 const POSTS_COLLECTION = 'posts';
 
@@ -73,6 +74,9 @@ export const createPost = async (input: CreatePostInput): Promise<Post> => {
     throw new Error('로그인이 필요합니다.');
   }
 
+  const authState = useAuthStore.getState();
+  const authorName = authState.name || user.displayName || user.email?.split('@')[0] || '익명';
+
   const docRef = await addDoc(collection(db, POSTS_COLLECTION), {
     title: input.title,
     location: input.location,
@@ -85,7 +89,7 @@ export const createPost = async (input: CreatePostInput): Promise<Post> => {
     commentsCount: 0,
     comments: [],
     authorId: user.uid,
-    authorName: user.displayName ?? user.email?.split('@')[0] ?? '익명',
+    authorName,
     createdAt: serverTimestamp(),
   });
 
@@ -104,7 +108,7 @@ export const createPost = async (input: CreatePostInput): Promise<Post> => {
     time: '방금 전',
     createdAt: new Date().toISOString(),
     authorId: user.uid,
-    authorName: user.displayName ?? user.email?.split('@')[0] ?? '익명',
+    authorName,
   };
 };
 

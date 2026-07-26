@@ -23,6 +23,8 @@ const PostCard = ({ post, onClick }: PostCardProps) => {
         <div className="post-card-meta">
           <span>{post.location}</span>
           <span className="post-card-meta-dot" />
+          <span>{post.authorName || '익명'}</span>
+          <span className="post-card-meta-dot" />
           <span>{post.time}</span>
         </div>
         <div className="post-card-footer">

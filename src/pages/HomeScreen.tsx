@@ -20,7 +20,8 @@ const HomeScreen: React.FC = () => {
   const filteredPosts = posts.filter(post =>
     post.title.includes(searchQuery) ||
     post.location.includes(searchQuery) ||
-    post.description.includes(searchQuery)
+    post.description.includes(searchQuery) ||
+    (post.authorName && post.authorName.includes(searchQuery))
   );
 
   const sortedPosts = homeTab === 'popular'
