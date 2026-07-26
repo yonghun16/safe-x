@@ -25,40 +25,22 @@ import {
  * 앱 브랜드 로고
  */
 export const Shield = () => (
-  <svg
-    width="48"
-    height="54"
-    viewBox="0 0 48 54"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M24 0C37.3333 4 45.3333 12 48 24C48 37.3333 37.3333 48.6667 24 54C10.6667 48.6667 0 37.3333 0 24C2.66667 12 10.6667 4 24 0Z"
-      fill="#FF7622"
-    />
-    <rect x="21" y="14" width="6" height="18" rx="3" fill="white" />
-    <circle cx="24" cy="38" r="3.5" fill="white" />
-  </svg>
+  <img
+    src="/safex.png"
+    alt="SafeX Logo"
+    style={{ width: "48px", height: "48px", objectFit: "contain" }}
+  />
 );
 
 /**
  * 작은 브랜드 로고
  */
 export const ShieldSmall = () => (
-  <svg
-    width="24"
-    height="27"
-    viewBox="0 0 24 27"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M12 0C18.6667 2 22.6667 6 24 12C24 18.6667 18.6667 24.3333 12 27C5.33333 24.3333 0 18.6667 0 12C1.33333 6 5.33333 2 12 0Z"
-      fill="#FF7622"
-    />
-    <rect x="10.5" y="7" width="3" height="9" rx="1.5" fill="white" />
-    <circle cx="12" cy="19" r="1.75" fill="white" />
-  </svg>
+  <img
+    src="/safex.png"
+    alt="SafeX Logo Small"
+    style={{ width: "24px", height: "24px", objectFit: "contain" }}
+  />
 );
 
 // ===== React Icons =====
