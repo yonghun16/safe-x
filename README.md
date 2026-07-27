@@ -68,7 +68,6 @@
 ### 검색 기능
 
 - 키워드 검색
-- 최근 검색어 저장
 - 추천 지역 제공
 - 검색 결과 조회
 
@@ -97,11 +96,7 @@
   - TypeScript
 
 - **Framework**
-  - React Native
-  - Expo
-
-- **Navigation**
-  - Expo Router
+  - React
 
 - **State Management**
   - Zustand
